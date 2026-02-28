@@ -18,7 +18,8 @@ func SearchHandler(c *gin.Context) {
 		return
 	}
 
-	results, err := search.Search(req.Query)
+	query := search.BuildQuery(req.Query)
+	results, err := search.Search(query)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"results": []interface{}{},
