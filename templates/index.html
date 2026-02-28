@@ -20,8 +20,8 @@
   <script>
     const messages = [];
 
-    function appendMessage(role, content) {
-      messages.push({ role, content });
+    function appendMessage(role, content, commands) {
+      messages.push({ role, content, commands: commands || [] });
       render();
     }
 
@@ -31,6 +31,21 @@
         if (m.role === 'user') {
           return `<div class="message user">${escapeHtml(m.content)}</div>`;
         }
+        const commandSection = (m.commands && m.commands.length > 0)
+          ? `<div class="commands">
+              <div class="commands-header">コマンド</div>
+              ${m.commands.map(cmd =>
+                `<div class="command-item">
+                  <div class="command-line">
+                    <code>$ ${escapeHtml(cmd.command)}</code>
+                    <button class="copy-btn" onclick="copyToClipboard('${escapeHtml(cmd.command)}')">コピー</button>
+                  </div>
+                  <div class="command-desc">${escapeHtml(cmd.description)}</div>
+                </div>`
+              ).join('')}
+            </div>`
+          : '';
+
         const cards = m.content.map(r =>
           `<div class="card">
             <a href="${escapeHtml(r.url)}" target="_blank">${escapeHtml(r.title)}</a>
@@ -38,7 +53,7 @@
             <p>${escapeHtml(r.snippet)}</p>
            </div>`
         ).join('');
-        return `<div class="message bot">${cards || '結果が見つかりませんでした'}</div>`;
+        return `<div class="message bot">${commandSection}${cards || '結果が見つかりませんでした'}</div>`;
       }).join('');
       container.scrollTop = container.scrollHeight;
     }
@@ -49,6 +64,17 @@
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).catch(() => {
+        const el = document.createElement('textarea');
+        el.value = text;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+      });
     }
 
     document.getElementById('search-form').addEventListener('submit', async (e) => {
@@ -68,7 +94,7 @@
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        appendMessage('bot', data.results || []);
+        appendMessage('bot', data.results || [], data.commands || []);
       } catch (err) {
         appendMessage('bot', [{ title: 'エラー', url: '#', snippet: err.message, source: '' }]);
       }

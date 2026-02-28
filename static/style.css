@@ -91,3 +91,60 @@ button {
   cursor: pointer;
 }
 button:hover { background: #74c7ec; }
+
+/* コマンドセクション */
+.commands {
+  background: #11111b;
+  border: 1px solid #45475a;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+}
+
+.commands-header {
+  font-size: 0.75em;
+  color: #a6e3a1;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.command-item {
+  margin-bottom: 8px;
+}
+
+.command-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.command-line code {
+  flex: 1;
+  background: #1e1e2e;
+  color: #cba6f7;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.copy-btn {
+  padding: 3px 10px;
+  font-size: 0.75em;
+  background: #45475a;
+  color: #cdd6f4;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: normal;
+}
+.copy-btn:hover { background: #585b70; }
+
+.command-desc {
+  font-size: 0.82em;
+  color: #a6adc8;
+  margin-top: 3px;
+  padding-left: 4px;
+}
