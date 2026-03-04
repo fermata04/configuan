@@ -11,8 +11,10 @@ import (
 )
 
 type CommandItem struct {
-	Command     string `json:"command"`
-	Description string `json:"description"`
+	Step        int      `json:"step"`
+	Command     string   `json:"command"`
+	Description string   `json:"description"`
+	Options     []string `json:"options"`
 }
 
 // Ollama API のリクエスト・レスポンス型
@@ -33,7 +35,7 @@ type ollamaResponse struct {
 	} `json:"message"`
 }
 
-var ollamaClient = &http.Client{Timeout: 30 * time.Second}
+var ollamaClient = &http.Client{Timeout: 120 * time.Second}
 
 // Summarize は検索結果スニペットを Ollama に渡し、
 // コマンド＋説明のリストを返す。
@@ -45,7 +47,7 @@ func Summarize(query string, results []SearchResult) ([]CommandItem, error) {
 	}
 	model := os.Getenv("OLLAMA_MODEL")
 	if model == "" {
-		model = "llama3.2"
+		model = "gpt-oss:20b"
 	}
 
 	// 検索結果スニペットを連結してプロンプトを構築
@@ -60,8 +62,9 @@ func Summarize(query string, results []SearchResult) ([]CommandItem, error) {
 	systemPrompt := `あなたはインフラエンジニア向けのアシスタントです。
 与えられた検索結果から、実際にターミナルで使えるコマンドを抽出してください。
 必ず以下のJSON形式のみを返してください。説明文や前置きは不要です。
+step は実行順序（1から連番）、options は主要なオプションの説明を配列で記載してください。
 
-{"commands": [{"command": "実際のコマンド", "description": "このコマンドの目的を1行で"}]}`
+{"commands": [{"step": 1, "command": "実際のコマンド", "description": "このコマンドの目的を1行で", "options": ["-x: オプションの説明"]}]}`
 
 	reqBody := ollamaRequest{
 		Model: model,
